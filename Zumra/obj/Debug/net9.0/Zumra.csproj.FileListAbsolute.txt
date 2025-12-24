@@ -149,3 +149,4 @@
 /home/mohamed/Code/Net/WEP/Zumra/Zumra/obj/Debug/net9.0/Zumra.pdb
 /home/mohamed/Code/Net/WEP/Zumra/Zumra/obj/Debug/net9.0/Zumra.genruntimeconfig.cache
 /home/mohamed/Code/Net/WEP/Zumra/Zumra/obj/Debug/net9.0/ref/Zumra.dll
+/home/mohamed/Code/Net/WEP/Zumra/Zumra/obj/Debug/net9.0/Zumra.sourcelink.json

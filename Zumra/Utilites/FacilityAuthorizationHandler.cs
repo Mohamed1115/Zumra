@@ -22,8 +22,9 @@ public class FacilityAuthorizationHandler :
         Facility facility)
     {
         // الحصول على User ID من Claims
-        var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
-        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+        var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        
+        if (string.IsNullOrEmpty(userId))
         {
             return;
         }
@@ -40,7 +41,8 @@ public class FacilityAuthorizationHandler :
         }
 
         // التحقق من الصلاحيات
-        if (userFacility.Role >= requirement.MinimumRole)
+        // بما أن 0 هو SuperAdmin و 1 هو Leader، فالأصغر هو الأعلى رتبة
+        if (userFacility.Role <= requirement.MinimumRole)
         {
             context.Succeed(requirement);
         }

@@ -27,12 +27,17 @@ public class AccountController:ControllerBase
     private readonly IEmailSender _emailSender;
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IRepository<Otp> _iRepositories;
-    public AccountController(IRepository<Otp> iRepositories, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, UserManager<ApplicationUser> userManager)
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _webHostEnvironment;
+
+    public AccountController(IRepository<Otp> iRepositories, SignInManager<ApplicationUser> signInManager, IEmailSender emailSender, UserManager<ApplicationUser> userManager, IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
     {
         _iRepositories = iRepositories;
         _signInManager = signInManager;
         _emailSender = emailSender;
         _userManager = userManager;
+        _configuration = configuration;
+        _webHostEnvironment = webHostEnvironment;
     }
     
     [HttpPost]
@@ -125,7 +130,7 @@ public class AccountController:ControllerBase
 
     private async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
     {
-        var Key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("AlksqozSj1zWgZgAwWF8cwz8nQCSfYsH"));
+        var Key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
         var cred = new SigningCredentials(Key,SecurityAlgorithms.HmacSha256);
         var userRoles= await _userManager.GetRolesAsync(user);
         var claims = new[]
@@ -140,8 +145,8 @@ public class AccountController:ControllerBase
         
         
         var token = new JwtSecurityToken(
-            issuer:"https://localhost:7042;http://localhost:5142",
-            audience:"https://localhost:7042;http://localhost:5142,https://localhost:5000;http://localhost:4200",
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
             claims: claims,
             expires: DateTime.Now.AddDays(1),
             signingCredentials:cred
@@ -174,46 +179,10 @@ public class AccountController:ControllerBase
             _userManager.AddToRoleAsync(user!, SD.UserRole).GetAwaiter().GetResult();
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var link = Url.Action(nameof(Confirm),"Account",new{token=token,id=user.Id},Request.Scheme);
-            var htmlMessage = $@"
-                        <html>
-                            <body style='margin: 0; padding: 0; background-color: #f3f6fb; font-family: Arial, sans-serif;'>
-                                <table width='100%' cellspacing='0' cellpadding='0' style='background-color: #f3f6fb; padding: 40px 0;'>
-                                    <tr>
-                                        <td align='center'>
-                                            <!-- Main Card -->
-                                            <table width='600' cellspacing='0' cellpadding='0' 
-                                                   style='background: #ffffff; border-radius: 10px; padding: 40px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);'>
-                                                <tr>
-                                                    <td align='center'>
-                                                        <h2 style='color: #1e3a8a; margin-bottom: 10px; font-size: 26px;'>
-                                                            Welcome to Our Website!
-                                                        </h2>
-                                                        <p style='color: #555; font-size: 16px; margin-bottom: 30px;'>
-                                                            Thanks for joining us! Please confirm your email address by clicking the button below.
-                                                        </p>
-                                                        
-                                                        <!-- Button -->
-                                                        <a href='{link}' style='display: inline-block; padding: 14px 28px; background: linear-gradient(90deg, #2563eb, #1e40af); color: #ffffff; text-decoration: none; font-size: 16px; border-radius: 6px; font-weight: bold; box-shadow: 0px 3px 8px rgba(37, 99, 235, 0.4);'>
-                                                            Confirm Email
-                                                        </a>
-                                                        
-                                                        <p style='color: #777; margin-top: 35px; font-size: 14px; line-height: 1.6;'>
-                                                            If you did not request this email, simply ignore it.<br>
-                                                            This link will expire shortly for your security.
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                            
-                                            <!-- Footer -->
-                                            <p style='color: #888; margin-top: 25px; font-size: 12px;'>
-                                                © 2025 Cinema — All Rights Reserved
-                                            </p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </body>
-                        </html>";
+            
+            var templatePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Templates", "ConfirmEmail.html");
+            var template = await System.IO.File.ReadAllTextAsync(templatePath);
+            var htmlMessage = template.Replace("{link}", link);
 
             await _emailSender.SendEmailAsync(vm.Email, "Confirm your email",htmlMessage);
             return Ok(new
@@ -274,48 +243,16 @@ public class AccountController:ControllerBase
             var otp = new Otp(Email, otpCode);
             await _iRepositories.CreatAsync(otp);
             
-            
-            
-            
             // var link = Url.Action(nameof(Confirm),"Account",new{token=token,id=user.Id},Request.Scheme);
-             var htmlMessage = $@"
-            <html>
-                <body style='margin: 0; padding: 0; background-color: #f3f6fb; font-family: Arial, sans-serif;'>
-                    <table width='100%' cellspacing='0' cellpadding='0' style='background-color: #f3f6fb; padding: 40px 0;'>
-                        <tr>
-                            <td align='center'>
-                                <table width='600' cellspacing='0' cellpadding='0' 
-                                       style='background: #ffffff; border-radius: 10px; padding: 40px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);'>
-                                    <tr>
-                                        <td align='center'>
-                                            <h2 style='color: #1e3a8a; margin-bottom: 10px; font-size: 26px;'>
-                                                Reset Your Password
-                                            </h2>
-                                            <p style='color: #555; font-size: 16px; margin-bottom: 30px;'>
-                                                We received a request to reset your password.<br>
-                                                Please use the OTP code below:
-                                            </p>
-
-                                            <div style='font-size: 32px; font-weight: bold; color: #1e40af; letter-spacing: 3px; margin-bottom: 30px;'>
-                                                {otpCode}
-                                            </div>
-
-                                            <p style='color: #777; margin-top: 20px; font-size: 14px; line-height: 1.6;'>
-                                                This OTP is valid for a short time only.<br>
-                                                If you did not request a password reset, please ignore this email.
-                                            </p>
-                                        </td>
-                                    </tr>
-                                </table>
-
-                                <p style='color: #888; margin-top: 25px; font-size: 12px;'>
-                                    © 2025 Cinema — All Rights Reserved
-                                </p>
-                            </td>
-                        </tr>
-                    </table>
-                </body>
-            </html>";
+             var templatePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Templates", "ResetPassword.html");
+             var template = await System.IO.File.ReadAllTextAsync(templatePath);
+             var htmlMessage = template
+                 .Replace("{0}", otpCode[0].ToString())
+                 .Replace("{1}", otpCode[1].ToString())
+                 .Replace("{2}", otpCode[2].ToString())
+                 .Replace("{3}", otpCode[3].ToString())
+                 .Replace("{4}", otpCode[4].ToString())
+                 .Replace("{5}", otpCode[5].ToString());
 
             await _emailSender.SendEmailAsync(Email, "Reset Password",htmlMessage);
             return Ok(new
@@ -426,46 +363,9 @@ public class AccountController:ControllerBase
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             var link = Url.Action(nameof(Confirm),"Account",new{token=token,id=user.Id},Request.Scheme);
-            var htmlMessage = $@"
-                        <html>
-                            <body style='margin: 0; padding: 0; background-color: #f3f6fb; font-family: Arial, sans-serif;'>
-                                <table width='100%' cellspacing='0' cellpadding='0' style='background-color: #f3f6fb; padding: 40px 0;'>
-                                    <tr>
-                                        <td align='center'>
-                                            <!-- Main Card -->
-                                            <table width='600' cellspacing='0' cellpadding='0' 
-                                                   style='background: #ffffff; border-radius: 10px; padding: 40px; box-shadow: 0px 4px 15px rgba(0,0,0,0.1);'>
-                                                <tr>
-                                                    <td align='center'>
-                                                        <h2 style='color: #1e3a8a; margin-bottom: 10px; font-size: 26px;'>
-                                                            Welcome to Our Website!
-                                                        </h2>
-                                                        <p style='color: #555; font-size: 16px; margin-bottom: 30px;'>
-                                                            Thanks for joining us! Please confirm your email address by clicking the button below.
-                                                        </p>
-                                                        
-                                                        <!-- Button -->
-                                                        <a href='{link}' style='display: inline-block; padding: 14px 28px; background: linear-gradient(90deg, #2563eb, #1e40af); color: #ffffff; text-decoration: none; font-size: 16px; border-radius: 6px; font-weight: bold; box-shadow: 0px 3px 8px rgba(37, 99, 235, 0.4);'>
-                                                            Confirm Email
-                                                        </a>
-                                                        
-                                                        <p style='color: #777; margin-top: 35px; font-size: 14px; line-height: 1.6;'>
-                                                            If you did not request this email, simply ignore it.<br>
-                                                            This link will expire shortly for your security.
-                                                        </p>
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                            
-                                            <!-- Footer -->
-                                            <p style='color: #888; margin-top: 25px; font-size: 12px;'>
-                                                © 2025 Cinema — All Rights Reserved
-                                            </p>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </body>
-                        </html>";
+            var templatePath = Path.Combine(_webHostEnvironment.ContentRootPath, "Templates", "ConfirmEmail.html");
+            var template = await System.IO.File.ReadAllTextAsync(templatePath);
+            var htmlMessage = template.Replace("{link}", link);
 
             await _emailSender.SendEmailAsync(Email, "Confirm your email",htmlMessage);
             return Ok(new

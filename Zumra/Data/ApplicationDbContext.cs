@@ -20,11 +20,13 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     // public DbSet<Category> Categories { get; set; }
     // public DbSet<Comment> Comments  { get; set; }
     public DbSet<Cart> Carts { get; set; }
+    public DbSet<UserImage> UserImages { get; set; }
     public DbSet<Coupon> Coupons { get; set; }
     public DbSet<Facility> Facilities { get; set; }
     public DbSet<UserFacility> UserFacilities { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         // تكوين Many-to-Many
         modelBuilder.Entity<UserFacility>()
             .HasKey(uf => new { uf.UserId, uf.FacilityId });

@@ -89,15 +89,17 @@ public class Program
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = "https://localhost:7042;http://localhost:5142",
-                ValidAudience = "https://localhost:7042;http://localhost:5142,https://localhost:5000;http://localhost:4200",
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:Audience"],
                 // ClockSkew = TimeSpan.Zero,
                 // RequireExpirationTime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("AlksqozSj1zWgZgAwWF8cwz8nQCSfYsH"))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
             };
         });
         builder.Services.AddAuthorization(options =>
         {
+            options.AddPolicy("FacilitySuperAdmin", policy =>
+                policy.Requirements.Add(new FacilityRequirement(FacilityRole.SuperAdmin)));
             // Policy للـ Leader فقط
             options.AddPolicy("FacilityLeader", policy =>
                 policy.Requirements.Add(new FacilityRequirement(FacilityRole.Leader)));
@@ -114,7 +116,7 @@ public class Program
 // تسجيل الـ Handler
         builder.Services.AddScoped<IAuthorizationHandler, FacilityAuthorizationHandler>();
         
-        builder.Services.AddControllers();
+
 
         var app = builder.Build();
 
