@@ -25,8 +25,7 @@ namespace Zumra.Migrations
                 name: "ImageId",
                 table: "AspNetUsers",
                 type: "int",
-                nullable: false,
-                defaultValue: 0);
+                nullable: true);
 
             migrationBuilder.CreateTable(
                 name: "Facilities",
@@ -98,8 +97,7 @@ namespace Zumra.Migrations
                 table: "AspNetUsers",
                 column: "ImageId",
                 principalTable: "UserImages",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
+                principalColumn: "Id");
         }
 
         /// <inheritdoc />

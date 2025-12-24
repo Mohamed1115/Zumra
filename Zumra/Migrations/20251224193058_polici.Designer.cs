@@ -12,7 +12,7 @@ using Zumra.Data;
 namespace Zumra.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251224185133_polici")]
+    [Migration("20251224193058_polici")]
     partial class polici
     {
         /// <inheritdoc />
@@ -177,7 +177,7 @@ namespace Zumra.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ImageId")
+                    b.Property<int?>("ImageId")
                         .HasColumnType("int");
 
                     b.Property<bool>("LockoutEnabled")
@@ -443,9 +443,7 @@ namespace Zumra.Migrations
                 {
                     b.HasOne("Zumra.Models.UserImage", "Image")
                         .WithMany()
-                        .HasForeignKey("ImageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ImageId");
 
                     b.Navigation("Image");
                 });
