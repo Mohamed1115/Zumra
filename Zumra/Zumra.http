@@ -1,0 +1,6 @@
+@Zumra_HostAddress = http://localhost:5243
+
+GET {{Zumra_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
