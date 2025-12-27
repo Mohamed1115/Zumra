@@ -10,10 +10,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("3b2fc4ca-540f-4456-8f13-57aa1a8e3b84")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("Zumra")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+557ca0273ebcc5d75fa665a87c861b19518c4dd4")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fcca63b62dab7422d586bb7b1a0f7d3bcb4e2d5e")]
 [assembly: System.Reflection.AssemblyProductAttribute("Zumra")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Zumra")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

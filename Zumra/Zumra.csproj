@@ -4,9 +4,11 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>3b2fc4ca-540f-4456-8f13-57aa1a8e3b84</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.10" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9"/>
         <PackageReference Include="Scalar.AspNetCore" Version="2.11.0" />

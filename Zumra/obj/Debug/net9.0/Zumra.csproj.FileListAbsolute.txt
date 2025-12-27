@@ -150,3 +150,7 @@
 /home/mohamed/Code/Net/WEP/Zumra/Zumra/obj/Debug/net9.0/Zumra.genruntimeconfig.cache
 /home/mohamed/Code/Net/WEP/Zumra/Zumra/obj/Debug/net9.0/ref/Zumra.dll
 /home/mohamed/Code/Net/WEP/Zumra/Zumra/obj/Debug/net9.0/Zumra.sourcelink.json
+/home/mohamed/Code/Net/WEP/Zumra/Zumra/bin/Debug/net9.0/Microsoft.AspNetCore.Authentication.Google.dll
+/home/mohamed/Code/Net/WEP/Zumra/Zumra/bin/Debug/net9.0/Zumra.staticwebassets.runtime.json
+/home/mohamed/Code/Net/WEP/Zumra/Zumra/obj/Debug/net9.0/compressed/d0kt7lmvrq-52e5akm0yl.gz
+/home/mohamed/Code/Net/WEP/Zumra/Zumra/obj/Debug/net9.0/compressed/0rzb3bewlc-qkr8fid2sf.gz

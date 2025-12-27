@@ -56,10 +56,33 @@ public class Program
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-        builder.Services.AddAuthentication().AddCookie(options =>
+        builder.Services.AddAuthentication(options =>
         {
-            options.LoginPath = "/Auth/Account/Login";
-            options.LogoutPath = "/Account/Logout";
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultSignInScheme = IdentityConstants.ExternalScheme; // For external login flow
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:Audience"],
+                // ClockSkew = TimeSpan.Zero,
+                // RequireExpirationTime = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+            };
+        })
+        .AddGoogle("google", opt =>
+        {
+            var googleAuth = builder.Configuration.GetSection("Authentication:Google");
+            opt.ClientId = googleAuth["ClientId"]??"";
+            opt.ClientSecret = googleAuth["ClientSecret"]??"";
+            opt.SignInScheme = IdentityConstants.ExternalScheme;
         });
 
         // Email Sender
@@ -75,27 +98,6 @@ public class Program
 
         StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
-
-
-        builder.Services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = builder.Configuration["Jwt:Issuer"],
-                ValidAudience = builder.Configuration["Jwt:Audience"],
-                // ClockSkew = TimeSpan.Zero,
-                // RequireExpirationTime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
-            };
-        });
         builder.Services.AddAuthorization(options =>
         {
             options.AddPolicy("FacilitySuperAdmin", policy =>
@@ -113,7 +115,7 @@ public class Program
                 policy.Requirements.Add(new FacilityRequirement(FacilityRole.Member)));
         });
 
-// تسجيل الـ Handler
+        // تسجيل الـ Handler
         builder.Services.AddScoped<IAuthorizationHandler, FacilityAuthorizationHandler>();
         
 
@@ -128,6 +130,8 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        
+        app.UseStaticFiles(); // Enable serving static files from wwwroot
         
         app.UseAuthentication();
 

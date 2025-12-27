@@ -384,6 +384,94 @@ public class AccountController:ControllerBase
         });
         
     }
+
+    [HttpPost]
+    public IActionResult ExternalLogin(string provider, string returnUrl = null)
+    {
+        // Generate absolute URL with explicit scheme and host
+        var redirectUrl = Url.Action(
+            nameof(ExternalLoginCallback), 
+            "Account", 
+            new { returnUrl }, 
+            protocol: Request.Scheme,
+            host: Request.Host.ToString()
+        );
+        var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+        return Challenge(properties, provider);
+    }
+    [HttpGet]
+    public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
+    {
+        returnUrl = returnUrl ?? "/";
+
+        if (remoteError != null)
+        {
+            return BadRequest(new { success = false, message = $"Error from external provider: {remoteError}" });
+        }
+
+        var info = await _signInManager.GetExternalLoginInfoAsync();
+        if (info == null)
+        {
+            return BadRequest(new { success = false, message = "Error loading external login information." });
+        }
+
+        // 1. Try to find the user by email (Google always provides email)
+        var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+        if (email == null)
+        {
+            return BadRequest(new { success = false, message = "Email not found from external provider." });
+        }
+
+        var user = await _userManager.FindByEmailAsync(email);
+        
+        // 2. If user does not exist, create a new one
+        if (user == null)
+        {
+            var username = info.Principal.FindFirstValue(ClaimTypes.Name) ?? "User";
+            user = new ApplicationUser
+            {
+                UserName = $"{username.Replace(" ", "").ToLower()}_{Guid.NewGuid().ToString().Substring(0, 8)}",
+                Name = username, // Fix: Assign Name property
+                Email = email,
+                EmailConfirmed = true // Google emails are verified
+            };
+
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                return BadRequest(new { success = false, message = "Error creating user.", errors = createResult.Errors });
+            }
+
+            // Add default role
+            await _userManager.AddToRoleAsync(user, SD.UserRole);
+        }
+
+        // 3. Link external login if not already linked
+        var logins = await _userManager.GetLoginsAsync(user);
+        if (!logins.Any(l => l.LoginProvider == info.LoginProvider))
+        {
+            var addLoginResult = await _userManager.AddLoginAsync(user, info);
+            if (!addLoginResult.Succeeded)
+            {
+                return BadRequest(new { success = false, message = "Error linking external login.", errors = addLoginResult.Errors });
+            }
+        }
+
+        // 4. Generate JWT Token
+        var token = await GenerateJwtTokenAsync(user);
+
+        // 5. Return JSON with token
+        return Ok(new 
+        { 
+            success = true, 
+            message = "Google Login successful", 
+            token = token,
+            email = user.Email,
+            username = user.UserName
+        });
+    }
+        
+    
     
     
 }

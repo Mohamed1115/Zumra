@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "yGS2AM0PNhQ=",
+  "dgSpecHash": "HkWtFHQJ8Ag=",
   "success": true,
   "projectFilePath": "/home/mohamed/Code/Net/WEP/Zumra/Zumra/Zumra.csproj",
   "expectedPackageFiles": [
@@ -9,6 +9,7 @@
     "/home/mohamed/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/home/mohamed/.nuget/packages/mapster/7.3.0/mapster.7.3.0.nupkg.sha512",
     "/home/mohamed/.nuget/packages/mapster.core/1.2.0/mapster.core.1.2.0.nupkg.sha512",
+    "/home/mohamed/.nuget/packages/microsoft.aspnetcore.authentication.google/9.0.10/microsoft.aspnetcore.authentication.google.9.0.10.nupkg.sha512",
     "/home/mohamed/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/9.0.10/microsoft.aspnetcore.authentication.jwtbearer.9.0.10.nupkg.sha512",
     "/home/mohamed/.nuget/packages/microsoft.aspnetcore.cryptography.internal/9.0.0/microsoft.aspnetcore.cryptography.internal.9.0.0.nupkg.sha512",
     "/home/mohamed/.nuget/packages/microsoft.aspnetcore.cryptography.keyderivation/9.0.0/microsoft.aspnetcore.cryptography.keyderivation.9.0.0.nupkg.sha512",
