@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Zumra")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fcca63b62dab7422d586bb7b1a0f7d3bcb4e2d5e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+600f6874d5f268498f3969bab8a533bc4b2a352b")]
 [assembly: System.Reflection.AssemblyProductAttribute("Zumra")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Zumra")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
